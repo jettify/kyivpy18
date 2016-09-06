@@ -82,6 +82,281 @@
                     <img src="img/aiohttp.png" height="100">
                     <img src="img/bottle.jpg" height="100">
 				</section>
+<!-- ####################################################################  -->
+				<section>
+					<h6>Motivation. Why we might want to have "automatic" admin interface?</h6>
+                    <ul>
+                        <li>For small web applications or micro service, where custom admin interface is overkill</li>
+                        <li>To give a manager something to play with while proper admin interface is not ready</li>
+                        <li>Could be solution if you hate to write a lot of <code>js/html</code> but have to</li>
+                    </ul>
+				</section>
+<!-- ####################################################################  -->
+				<section>
+					<h6>Existing admin libraries</h6>
+                    <ul>
+                        Pyramid
+                        <li><a>https://github.com/Javex/pyramid_crud</a></li>
+                        <li><a>https://github.com/appetito/pyramid_admin</a></li>
+                        <li><a>https://github.com/tarzanjw/pyramid_admin2</a></li>
+                        Flask
+                        <li><a>https://github.com/flask-admin/flask-admin/</a></li>
+                        <li><a>https://github.com/jeanphix/Flask-Dashed</a></li>
+                        <li><a>https://github.com/syrusakbary/flask-superadmin/</a></li>
+                        Bottle
+                        <li><a>https://github.com/avelino/bottle-admin</a></li>
+                        Django
+                        <li><a>https://github.com/django/django</a></li>
+                    </ul>
+        </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Review Django Admin</h6>
+                    <ul>
+                        <li>Battle tested</li>
+                        <li>Large number of extensions that sometimes work</li>
+                        <li>Huge community</li>
+                        <li>Auth out of the box</li>
+                        <li>Tightly coupled with Django</li>
+                        <li>Supports only RDBMS through Django ORM</li>
+                    </ul>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Review Flask-Admin</h6>
+                    <ul>
+                        <li>DB and ORM agnostic (supports SQLA, Peewee, MongoEngine, pymongo etc.)</li>
+                        <li>Somewhat easy to extend, there is nice interface for that</li>
+                        <li>Large community, admin used in several other opens source projects</li>
+                        <li>Relies to much on WTForms, forces you sometimes to mix js with python</li>
+
+                    </ul>
+
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin requirements</h6>
+                    How modern admin view should look like?
+                    <p></p>
+                    <ol>
+                        <li>Should be SPA (No WTForms sh*t) </li>
+                        <li>Should be DB/ORM agnostic</li>
+                        <li>Should use <code>asyncio/aiohttp</code></li>
+                        <li>Should be pluggable and extensible</li>
+                    </ol>
+				</section>
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin overview</h6>
+                    <p></p>
+                    <p> Demo </p>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin architecture</h6>
+                    <img src="img/scheme.svg" height="500">
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Supported Databases</h6>
+                    <img src="img/mysql.svg" height="150">
+                    <img src="img/pg.png" height="150">
+                    <img src="img/mongo.png" height="150">
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Python Application Dependencies</h6>
+                    <code>
+                        aiohttp trafaret
+                        {aiomysql aiopg sqlalchemy motor}
+                    </code>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>ng-admin is frontend for aiohttp_admin</h6>
+                    <ul>
+                        <li><a>ng-admin</a> could be plugged to your RESTFul API to get a complete
+                            administration interface (datagrid, filters, multi-model relationships,
+                            dashboard) in no time.</li>
+                        <li>Beyond simple CRUD, ng-admin lets you build sophisticated GUIs without getting in your way.</li>
+                    </ul>
+                <pre><img src="img/nd-admin.png"></pre>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin setup: step 1</h6>
+                    Suppose we have two tables: <code>question</code> and
+                    <code>choice</code> from polls aiohttp demo.
+                    <!-- TODO: add link for demo -->
+                    <pre><code class="hljs python" data-trim>
+import asyncio
+import sqlalchemy as sa
+
+meta = sa.MetaData()
+question = sa.Table(
+    'question', meta,
+    sa.Column('id', sa.Integer, nullable=False),
+    sa.Column('question_text', sa.String(200), nullable=False),
+    sa.Column('pub_date', sa.Date, nullable=False))
+
+choice = sa.Table(
+    'choice', meta,
+    sa.Column('id', sa.Integer, nullable=False),
+    sa.Column('question_id', sa.Integer, nullable=False),
+    sa.Column('choice_text', sa.String(200), nullable=False),
+    sa.Column('votes', sa.Integer, server_default="0", nullable=False))
+                    </code></pre>
+                </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin setup: step 2</h6>
+                    Create admin extension and then register each table
+                    we want to have admin views
+                    <pre><code class="hljs python" data-trim>
+def setup_admin(app, pg, admin_config_path):
+    admin = aiohttp_admin.setup(app, admin_config_path)
+    admin.add_resource(PGResource(pg, db.question, url='question'))
+    admin.add_resource(PGResource(pg, db.choice, url='choice'))
+    return admin
+
+async def init(loop):
+    # ...
+    app = web.Application(loop=loop)
+    # ...
+    admin_config = str(PROJ_ROOT / 'static' / 'js')
+    setup_admin(app, pg, admin_config)
+                    </code></pre>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Example of REST routes</h6>
+                    On background REST routes created for each registered
+                    entity
+                    <pre>
+<b>GET</b>    /admin/question
+<b>GET</b>    /admin/question/{entity_id}
+<b>POST</b>   /admin/question
+<b>PUT</b>    /admin/question/{entity_id}
+<b>DELETE</b> /admin/question/{entity_id}
+                    </pre>
+
+                    <pre>
+<b>GET</b>    /admin/choice
+<b>GET</b>    /admin/choice/{entity_id}
+<b>POST</b>   /admin/choice
+<b>PUT</b>    /admin/choice/{entity_id}
+<b>DELETE</b> /admin/choice/{entity_id}
+                    </pre>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin setup: step 3</h6>
+                    Create declare list view for entity <code>config.js</code>
+                    <pre><code class="hljs javascript" data-trim>
+var question = nga.entity('question');
+admin.addEntity(question)
+
+question.listView()
+    .title('All questions')
+    .description('List of question with infinite pagination')
+    .infinitePagination(true)
+    .fields([
+        nga.field('id').label('id'),
+        nga.field('question_text'),
+        nga.field('pub_date', 'date'),
+    ])
+    .filters([
+        nga.field('pub_date', 'date')
+            .label('Posted')
+            .attributes({'placeholder': 'Filter by date'}),
+    ])
+    .listActions(['show', 'edit', 'delete']);
+
+            </code></pre>
+        </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin setup: step 4</h6>
+                    Declare create and delete views for entity in <code>config.js</code>
+                    <pre><code class="hljs javascript" data-trim>
+question.creationView()
+    .fields([
+        nga.field('question_text', 'wysiwyg'),
+        nga.field('pub_date', 'date')
+    ]);
+
+question.deletionView()
+    .title('Deletion confirmation');
+    </code></pre>
+        </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin setup: step 4</h6>
+                    Declare edit views for entity in <code>config.js</code>
+                    <pre><code class="hljs javascript" data-trim>
+question.editionView()
+    .title('Edit question')
+    .actions(['list', 'show', 'delete'])
+    .fields([
+        nga.field('id')
+        .editable(false)
+        .label('id'),
+        question.creationView().fields(),
+        nga.field('choice', 'referenced_list')
+            .targetEntity(nga.entity('choice'))
+            .targetReferenceField('question_id')
+            .targetFields([
+                nga.field('id').isDetailLink(true),
+                nga.field('votes').label('Votes'),
+                nga.field('choice_text').label('Choise')
+            ])
+            .sortField('votes')
+            .sortDir('DESC')
+            .listActions(['edit']),
+    ]);
+                    </code></pre>
+        </section>
+<!-- ####################################################################  -->
+				<section>
+					<h6>Open Issues1: Authentication and permission control</h6>
+                    <ul>
+                        <li><i>Could be solved by introducing <code>jwt</code> token interface. It is 
+                           users responsibility to implement token route and user management,
+                           since admin extension does not know anything about user</i></li>
+                        <li><i>Just use basic authentication, any additional features
+                                are users headache</i></li>
+                    </ul>
+        </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Open Issues2: automatic code generation  </h6>
+                    <ul>
+                        <li><i> In simplest case <code>jinja2</code> templates could be used
+                            for initial code generation. As alternative configuration could be generated
+                            dynamically using <code>js</code> or <code>python</code></i></li>
+                        <li><i>Add <code>js</code> logic to generate admin configuration based on
+                                exposed metadata using REST API </i></li>
+                        <li><i>Add <code>python</code> logic to generate admin configuraion on the fly, using
+                            familiar django syntax</i></li>
+
+                    </ul>
+        </section>
+
+<!-- ####################################################################  -->
 				<section data-background="#fefefe">
 					<h1>THE END</h1>
 					<p>
