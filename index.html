@@ -72,7 +72,7 @@
 				</section>
 
 <!-- ####################################################################  -->
-				<section id="poll"> <h5>What framework do you use?</h5>
+				<section id="poll"> <h5>What web framework do you use?</h5>
                     <img src="img/pyramid.png" height="100">
                     <img src="img/django.png" height="100">
                     <img src="img/flask.png" height="100">
@@ -82,6 +82,60 @@
                     <img src="img/aiohttp.png" height="100">
                     <img src="img/bottle.jpg" height="100">
 				</section>
+<!-- ####################################################################  -->
+				<section>
+					<h6>Motivation. Why we might want to have "automatic" admin interface?</h6>
+                    <ul>
+                        <li>For small web applications or micro services, where custom admin interface is overkill.</li>
+                        <li>To give a manager something to play with while proper admin interface is not ready.</li>
+                        <li>Could be solution if you absolutly hate to write a lot of <code>js/html</code> but have to</li>
+                    </ul>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Existing admin libraries</h6>
+                    <ul>
+                        Pyramid
+                        <li><a>https://github.com/Javex/pyramid_crud</a></li>
+                        <li><a>https://github.com/appetito/pyramid_admin</a></li>
+                        <li><a>https://github.com/tarzanjw/pyramid_admin2</a></li>
+                        Flask
+                        <li><a>https://github.com/flask-admin/flask-admin/</a></li>
+                        <li><a>https://github.com/jeanphix/Flask-Dashed</a></li>
+                        <li><a>https://github.com/syrusakbary/flask-superadmin/</a></li>
+                        Bottle
+                        <li><a>https://github.com/avelino/bottle-admin</a></li>
+                        Django
+                        <li><a>https://github.com/django/django</a></li>
+                    </ul>
+                </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Review Django Admin</h6>
+                    <ul>
+                        <li>Battle tested</li>
+                        <li>Large number of extensions that sometimes work</li>
+                        <li>Relies on Forms</li>
+                        <li>Auth out of the box</li>
+                        <li>Tightly coupled with Django</li>
+                        <li>Supports only RDBMS through Django ORM</li>
+                    </ul>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Review Flask-Admin</h6>
+                    <ul>
+                        <li>DB and ORM agnostic (supports SQLA, Peewee, MongoEngine, pymongo etc.)</li>
+                        <li>Somewhat easy to extend, there is nice interface for that</li>
+                        <li>Large community, admin used in several other opens source projects</li>
+                        <li>Relies to much on WTForms, forces you sometimes to mix js with python</li>
+                        <li>Only basic auth out of the box</li>
+                    </ul>
+				</section>
+
 				<section data-background="#fefefe">
 					<h1>THE END</h1>
 					<p>
