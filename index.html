@@ -136,11 +136,447 @@
                     </ul>
 				</section>
 
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin requirements</h6>
+                    How modern admin view should look like?
+                    <p></p>
+                    <ol>
+                        <li>Server side and frontend should be clearly separated (No WTForms sh*t) </li>
+                        <li>Should be DB/ORM agnostic</li>
+                        <li>Should use <code>asyncio/aiohttp</code></li>
+                        <li>Should be pluggable and extensible</li>
+                    </ol>
+				</section>
+
+<!-- ####################################################################  -->
+				<section data-background-image="http://example.com/image.png">
+					<h6>aiohttp_admin overview (Demo)</h6>
+                    <img src="img/admin_main.png" height="600">
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>aiohttp_admin architecture overview</h6>
+                    <img src="img/scheme.svg" height="500">
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Database Layer</h6>
+                    <p>Supported Databases out of the box</p>
+                    <img src="img/mysql.svg" height="150">
+                    <img src="img/pg.png" height="150">
+                    <img src="img/mongo.png" height="130">
+                    <p>ODBC databases (SQLite, MSSQL, Oracle) comming soon</p> using <code>aioodbc</code>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>REST Layer</h6>
+                    <ul>
+                        <li><code>Python 3.5+</code> - because async/await stuff</li>
+                        <li><code>aiohttp</code> - as platform and REST framework</li>
+                        <li><code>trafaret</code> - provides validataion and model desctiption</li>
+                        <li><code>python-dateutil</code> - for simpler datatime manipulation</li>
+                        <li><code>aiohttp_jinja2</code> - for basic template rendering</li>
+                        <li><code>{aiomysql aiopg sqlalchemy motor}</code> as means of database access</li>
+                    </ul>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Frontend Layer</h6>
+					<p>ng-admin is frontend for aiohttp_admin</p>
+                    <ul>
+                        <li><a>ng-admin</a> could be plugged to your RESTFul API to get a complete
+                            administration interface (datagrid, filters, multi-model relationships,
+                            dashboard) in no time.</li>
+                        <li>Beyond simple CRUD, ng-admin lets you build sophisticated GUIs without getting in your way.</li>
+                    </ul>
+                <pre><img src="img/nd-admin.png"></pre>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Getting Started with aiohttp_admin: Polls Demo</h6>
+                    We will explore <code>aiohttp_admin</code> capabilities using
+                    simple example: polls demo from <colde>aiohttp</code>
+                    <p></p>
+                    <blockquote>
+                    <i>Polls</i>  - simple application that lets people view
+                    polls and vote in them. An admin site that lets you add,
+                    change, and delete polls.
+                    </blockquote>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Polls: database tables</h6>
+                    Suppose we have two tables: <code>question</code> and
+                    <code>choice</code> from polls aiohttp demo.
+                    <!-- TODO: add link for demo -->
+                    <pre><code class="hljs sql" data-trim>
+-- question table
+CREATE TABLE public.question
+(
+  id integer NOT NULL DEFAULT nextval('question_id_seq'::regclass),
+  question_text character varying(200) NOT NULL,
+  pub_date date NOT NULL,
+)
+-- choice table
+CREATE TABLE public.choice
+(
+  id integer NOT NULL DEFAULT nextval('choice_id_seq'::regclass),
+  question_id integer NOT NULL,
+  choice_text character varying(200) NOT NULL,
+  votes integer NOT NULL DEFAULT 0,
+)
+                    </code></pre>
+                </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>SQLA table mapping</h6>
+                    Tables: <code>question</code> and
+                    <code>choice</code> defined using SQLAlchemy
+                    <!-- TODO: add link for demo -->
+                    <pre><code class="hljs python" data-trim>
+import asyncio
+import sqlalchemy as sa
+
+meta = sa.MetaData()
+question = sa.Table(
+    'question', meta,
+    sa.Column('id', sa.Integer, nullable=False),
+    sa.Column('question_text', sa.String(200), nullable=False),
+    sa.Column('pub_date', sa.Date, nullable=False))
+
+choice = sa.Table(
+    'choice', meta,
+    sa.Column('id', sa.Integer, nullable=False),
+    sa.Column('question_id', sa.Integer, nullable=False),
+    sa.Column('choice_text', sa.String(200), nullable=False),
+    sa.Column('votes', sa.Integer, server_default="0", nullable=False))
+                    </code></pre>
+                </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Registering admin application</h6>
+                    Create admin extension and then register each table
+                    we want to have admin views
+                    <pre><code class="hljs python" data-trim>
+def setup_admin(app, pg, admin_config_path):
+    admin = aiohttp_admin.setup(app, admin_config_path)
+    admin.add_resource(PGResource(pg, db.question, url='question'))
+    admin.add_resource(PGResource(pg, db.choice, url='choice'))
+    return admin
+
+async def init(loop):
+    # ...
+    app = web.Application(loop=loop)
+    # ...
+    admin_config = str(PROJ_ROOT / 'static' / 'js')
+    setup_admin(app, pg, admin_config)
+                    </code></pre>
+				</section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>REST routes crated aoutmatically</h6>
+                    On background REST routes created for each registered
+                    entity
+                    <pre>
+<b>GET</b>    /admin/question
+<b>GET</b>    /admin/question/{entity_id}
+<b>POST</b>   /admin/question
+<b>PUT</b>    /admin/question/{entity_id}
+<b>DELETE</b> /admin/question/{entity_id}
+                    </pre>
+                    <pre>
+<b>GET</b>    /admin/choice
+<b>GET</b>    /admin/choice/{entity_id}
+<b>POST</b>   /admin/choice
+<b>PUT</b>    /admin/choice/{entity_id}
+<b>DELETE</b> /admin/choice/{entity_id}
+                    </pre>
+                    pagination defined in query parameters
+            <pre> <code>
+/admin/question?_filters={"q":"n"}&_page=1
+&_perPage=30&_sortDir=ASC&_sortField=_id
+            </code> </pre>
+				</section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>Creating first config.js</h6>
+            All admin views declaration happnes in <code>config.js</code>
+            file.
+            <pre><code class="hljs javascript" data-trim>
+(function () {
+    "use strict";
+    // BUNCH OF BOILERPLATE CODE
+    var app = angular.module('aiohttp_admin', ['ng-admin']);
+
+    app.config(['NgAdminConfigurationProvider', function (NgAdminConfigurationProvider) {
+        var nga = NgAdminConfigurationProvider;
+        // basic admin configuration
+        var admin = nga.application('aiohttp admin demo')
+            .debug(true)
+            .baseApiUrl('/admin/');
+
+        // registering entities
+        var question = nga.entity('question');
+        var choice = nga.entity('choice');
+        admin
+            .addEntity(question)
+            .addEntity(choice);
+        // entities definition
+
+        nga.configure(admin);
+    // BUNCH OF BOILERPLATE CODE
+    }]);
+}());
+            </code></pre>
+        </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>List view</h6>
+                    Create declare list view for entity <code>config.js</code>
+                    <pre><code class="hljs javascript" data-trim>
+var question = nga.entity('question');
+admin.addEntity(question)
+
+question.listView()
+    .title('All questions')
+    .description('List of question with infinite pagination')
+    .infinitePagination(true)
+    .fields([
+        nga.field('id').label('id'),
+        nga.field('question_text'),
+        nga.field('pub_date', 'date'),
+    ])
+    .filters([
+        nga.field('pub_date', 'date')
+            .label('Posted')
+            .attributes({'placeholder': 'Filter by date'}),
+    ])
+    .listActions(['show', 'edit', 'delete']);
+
+            </code></pre>
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>aiohttp_admin (demo): list view</h6>
+            <img src="img/admin_polls_list.png" height="600">
+            <a target="_blank" href="http://127.0.0.1:9002/admin#/question/list">http://127.0.0.1:9002/admin#/question/list</a>
+        </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Creation and deletion views</h6>
+                    Declare create and delete views for entity in <code>config.js</code>
+                    <pre><code class="hljs javascript" data-trim>
+question.creationView()
+    .fields([
+        nga.field('question_text', 'wysiwyg'),
+        nga.field('pub_date', 'date')
+    ]);
+
+question.deletionView()
+    .title('Deletion confirmation');
+    </code></pre>
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>aiohttp_admin (demo): create view</h6>
+            <img src="img/admin_polls_create.png" height="600">
+            <a target="_blank" href="http://127.0.0.1:9002/admin#/question/create">http://127.0.0.1:9002/admin#/question/create</a>
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>aiohttp_admin (demo): delete view</h6>
+            <img src="img/admin_polls_delete.png" height="600">
+            <a target="_blank" href="http://127.0.0.1:9002/admin#/question/delete/999">http://127.0.0.1:9002/admin#/question/delete/999</a>
+        </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Edition View</h6>
+                    Declare edit views for entity in <code>config.js</code>
+                    <pre><code class="hljs javascript" data-trim>
+question.editionView()
+    .title('Edit question')
+    .actions(['list', 'show', 'delete'])
+    .fields([
+        nga.field('id')
+        .editable(false)
+        .label('id'),
+        question.creationView().fields(),
+        nga.field('choice', 'referenced_list')
+            .targetEntity(nga.entity('choice'))
+            .targetReferenceField('question_id')
+            .targetFields([
+                nga.field('id').isDetailLink(true),
+                nga.field('votes').label('Votes'),
+                nga.field('choice_text').label('Choise')
+            ])
+            .sortField('votes')
+            .sortDir('DESC')
+            .listActions(['edit']),
+    ]);
+                    </code></pre>
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>aiohttp_admin (demo): edit view</h6>
+            <img src="img/admin_polls_edit.png" height="600">
+            <a target="_blank" href="http://127.0.0.1:9002/admin#/question/edit/999">http://127.0.0.1:9002/admin#/question/edit/999</a>
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>Supported multi-model relationships</h6>
+            Relationhsip defined byt special refernece field type:
+            <ul>
+                <li><code>reference</code> - for one to one relationships</li>
+                <li><code>referenced_list</code> - for many to one relationships</li>
+                <li><code>reference_many</code> - for many to one relationships</li>
+                <li><code>embedded_list</code> - for embedded in json field data</li>
+            </ul>
+
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>reference filed type</h6>
+            <pre><code class="hljs javascript" data-trim>
+GET /comments/123
+{
+    "id": 123,
+    "body": "Lorem ipsum sic dolor amet...",
+    "post_id": 456 // foreign key to post of id 456
+}
+GET /posts/456
+{
+    "id": "456",
+    "title": "Consectetur adipisicing elit",
+    "body": "Sed do eiusmod..."
+}
+                    </code></pre>
+                    Used for one to one mapping, when you need to link post
+                    entity in comment view.
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>reference_list filed type</h6>
+            <pre><code class="hljs javascript" data-trim>
+GET /posts/456
+{
+    "id": "456",
+    "title": "Consectetur adipisicing elit",
+    "body": "Sed do eiusmod..."
+}
+GET /comments/123
+{
+    "id": 123,
+    "author": "Alice",
+    "body": "Lorem ipsum sic dolor amet...",
+    "post_id": 456 // foreign key to post of id 456
+}
+GET /comments/124
+{
+    "id": 124,
+    "author": "Bob",
+    "body": "Lorem ipsum sic dolor amet...",
+    "post_id": 456 // foreign key to post of id 456
+}
+            </code></pre>
+        The referenced_list type maps a one-to-many relationship where the
+        foreign key is located in another entity.
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>reference_many filed type</h6>
+            <pre><code class="hljs javascript" data-trim>
+GET /posts/456
+{
+    "id": "456",
+    "title": "Consectetur adipisicing elit",
+    "body": "Sed do eiusmod...",
+    "comments": [123, 124]
+}
+
+GET /comments/123
+{
+    "id": 123,
+    "author": "Alice",
+    "body": "Lorem ipsum sic dolor amet...",
+}
+GET /comments/124
+{
+    "id": 124,
+    "author": "Bob",
+    "body": "Lorem ipsum sic dolor amet...",
+}
+
+            </code></pre>
+        The reference_many type maps a one-to-many relationship
+        where the identifiers of the related entities are embedded in
+        the main response.
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>Open Issues1: Authentication and permission control</h6>
+            <ul>
+                <li><i>Could be solved by introducing <code>jwt</code> token interface. It is
+                   users responsibility to implement token route and user management,
+                   since admin extension does not know anything about user</i></li>
+                <li><i>Just use basic authentication, any additional features
+                        are users headache</i></li>
+            </ul>
+        </section>
+
+<!-- ####################################################################  -->
+				<section>
+					<h6>Open Issues2: automatic code generation  </h6>
+                    <ul>
+                        <li><i> In simplest case <code>jinja2</code> templates could be used
+                            for initial code generation. As alternative configuration could be generated
+                            dynamically using <code>js</code> or <code>python</code></i></li>
+                        <li><i>Add <code>js</code> logic to generate admin configuration based on
+                                exposed metadata using REST API </i></li>
+                        <li><i>Add <code>python</code> logic to generate admin configuraion on the fly, using
+                            familiar django syntax</i></li>
+
+                    </ul>
+        </section>
+
+<!-- ####################################################################  -->
+        <section>
+            <h6>Recap</h6>
+            <ul>
+                <li>Current admin frameworks should adapt modern practices</li>
+                <li>Do not use Djano because only because admin</li>
+                <li><code>aiohttp</code> is mature framework for web development</li>
+                <li><code>aiohttp_admin</code> is looking for developers and testers</li>
+            </ul>
+        </section>
+
+<!-- ####################################################################  -->
 				<section data-background="#fefefe">
 					<h1>THE END</h1>
-					<p>
-						<a href="http://jettify.github.io/kyivpy18"> http://jettify.github.io/kyivpy18</a> <br>
-                    </p>
+					<p><a href="http://jettify.github.io/kyivpy18"> http://jettify.github.io/kyivpy18</a> <br></p>
+					<p><a href="https://github.com/aio-libs/aiohttp_admin">https://github.com/aio-libs/aiohttp_admin</a> <br></p>
 				</section>
 
 <!-- ####################################################################  -->
