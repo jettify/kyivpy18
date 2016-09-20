@@ -377,7 +377,7 @@ question.listView()
 
 <!-- ####################################################################  -->
 				<section>
-					<h6>Creation and deletion views</h6>
+					<h6>Creation and Deletion Views</h6>
                     Declare create and delete views for entity in <code>config.js</code>
                     <pre><code class="hljs javascript" data-trim>
 question.creationView()
@@ -393,14 +393,14 @@ question.deletionView()
 
 <!-- ####################################################################  -->
         <section>
-            <h6>aiohttp_admin (demo): create view</h6>
+            <h6>aiohttp_admin (Demo): Creation view</h6>
             <img src="img/admin_polls_create.png" height="600">
             <a target="_blank" href="http://127.0.0.1:9002/admin#/question/create">http://127.0.0.1:9002/admin#/question/create</a>
         </section>
 
 <!-- ####################################################################  -->
         <section>
-            <h6>aiohttp_admin (demo): delete view</h6>
+            <h6>aiohttp_admin (Demo): Deletion View</h6>
             <img src="img/admin_polls_delete.png" height="600">
             <a target="_blank" href="http://127.0.0.1:9002/admin#/question/delete/999">http://127.0.0.1:9002/admin#/question/delete/999</a>
         </section>
@@ -435,7 +435,7 @@ question.editionView()
 
 <!-- ####################################################################  -->
         <section>
-            <h6>aiohttp_admin (demo): edit view</h6>
+            <h6>aiohttp_admin (Demo): Edition View</h6>
             <img src="img/admin_polls_edit.png" height="600">
             <a target="_blank" href="http://127.0.0.1:9002/admin#/question/edit/999">http://127.0.0.1:9002/admin#/question/edit/999</a>
         </section>
@@ -470,8 +470,8 @@ GET /posts/456
     "body": "Sed do eiusmod..."
 }
                     </code></pre>
-                    Used for one to one mapping, when you need to link post
-                    entity in comment view.
+                    The <code>reference</code> used for one to one mapping,
+                    when you need to link post entity in comment view.
         </section>
 
 <!-- ####################################################################  -->
@@ -499,7 +499,7 @@ GET /comments/124
     "post_id": 456 // foreign key to post of id 456
 }
             </code></pre>
-        The referenced_list type maps a one-to-many relationship where the
+            The <code>referenced_list</code> type maps a one-to-many relationship where the
         foreign key is located in another entity.
         </section>
 
@@ -514,7 +514,6 @@ GET /posts/456
     "body": "Sed do eiusmod...",
     "comments": [123, 124]
 }
-
 GET /comments/123
 {
     "id": 123,
@@ -529,7 +528,7 @@ GET /comments/124
 }
 
             </code></pre>
-        The reference_many type maps a one-to-many relationship
+            The <code>reference_many</code> type maps a one-to-many relationship
         where the identifiers of the related entities are embedded in
         the main response.
         </section>
@@ -538,26 +537,29 @@ GET /comments/124
         <section>
             <h6>Open Issues1: Authentication and permission control</h6>
             <ul>
-                <li><i>Could be solved by introducing <code>jwt</code> token interface. It is
+                <li>Could be solved by introducing <a href="https://jwt.io/">jwt</a> token interface. It is
                    users responsibility to implement token route and user management,
-                   since admin extension does not know anything about user</i></li>
-                <li><i>Just use basic authentication, any additional features
-                        are users headache</i></li>
+                   since admin extension does not know anything about user. Permissions
+                   should be checked on REST level</li>
+                <li>Just use basic authentication, any additional features
+                    are users headache</li>
             </ul>
         </section>
 
 <!-- ####################################################################  -->
 				<section>
-					<h6>Open Issues2: automatic code generation  </h6>
+					<h6>Open Issues2: automatic config generation  </h6>
                     <ul>
-                        <li><i> In simplest case <code>jinja2</code> templates could be used
-                            for initial code generation. As alternative configuration could be generated
-                            dynamically using <code>js</code> or <code>python</code></i></li>
-                        <li><i>Add <code>js</code> logic to generate admin configuration based on
-                                exposed metadata using REST API </i></li>
-                        <li><i>Add <code>python</code> logic to generate admin configuraion on the fly, using
-                            familiar django syntax</i></li>
-
+                        <li> In simplest case <code>jinja2</code> templates could be used
+                            for initial code generation</li>
+                        <li>Add <code>js</code> logic to generate admin configuration based on
+                                exposed metadata using REST API </li>
+                        <li>Add <code>python</code> logic to generate admin configuraion on the fly, using
+                            familiar django syntax</li>
+                        <p></p>
+                        <hr>
+                        But you know what? It is possible to have all options
+                        in once and let users decide.
                     </ul>
         </section>
 
@@ -565,10 +567,10 @@ GET /comments/124
         <section>
             <h6>Recap</h6>
             <ul>
-                <li>Current admin frameworks should adapt modern practices</li>
-                <li>Do not use Djano because only because admin</li>
                 <li><code>aiohttp</code> is mature framework for web development</li>
                 <li><code>aiohttp_admin</code> is looking for developers and testers</li>
+                <li>Current admin frameworks should adapt modern practices</li>
+                <li>Do not use Django only because free admin</li>
             </ul>
         </section>
 
