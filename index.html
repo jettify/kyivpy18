@@ -101,7 +101,7 @@
                     <ul>
                         <li>For small web applications or micro services, where custom admin interface is overkill.</li>
                         <li>To give a manager something to play with while proper admin interface is not ready.</li>
-                        <li>Could be solution if you absolutly hate to write a lot of <code>js/html</code> but have to</li>
+                        <li>Could be solution if you absolutely hate to write a lot of <code>js/html</code> but have to</li>
                     </ul>
 				</section>
 
@@ -135,7 +135,7 @@
                         <li>Relies on Forms</li>
                         <li>Tightly coupled with Django</li>
                         <li>Supports only RDBMS through Django ORM, no
-                            support for hipsters DBs</li>
+                            support for hipsters NoSQLs</li>
                     </ul>
 				</section>
 
@@ -184,7 +184,7 @@
                     <img src="img/mysql.svg" height="150">
                     <img src="img/pg.png" height="150">
                     <img src="img/mongo.png" height="130">
-                    <p>ODBC databases (SQLite, MSSQL, Oracle) comming soon</p> using <code>aioodbc</code>
+                    <p>ODBC databases (SQLite, MSSQL, Oracle) coming soon</p> using <code>aioodbc</code>
 				</section>
 
 <!-- ####################################################################  -->
@@ -193,8 +193,8 @@
                     <ul>
                         <li><code>Python 3.5+</code> - because async/await stuff</li>
                         <li><code>aiohttp</code> - as platform and REST framework</li>
-                        <li><code>trafaret</code> - provides validataion and model desctiption</li>
-                        <li><code>python-dateutil</code> - for simpler datatime manipulation</li>
+                        <li><code>trafaret</code> - provides validation and model description</li>
+                        <li><code>python-dateutil</code> - for simpler datetime manipulation</li>
                         <li><code>aiohttp_jinja2</code> - for basic template rendering</li>
                         <li><code>{aiomysql aiopg sqlalchemy motor}</code> as means of database access</li>
                     </ul>
@@ -327,7 +327,7 @@ async def init(loop):
 <!-- ####################################################################  -->
         <section>
             <h6>Creating first config.js</h6>
-            All admin views declaration happnes in <code>config.js</code>
+            All admin views declaration happens in <code>config.js</code>
             file.
             <pre><code class="hljs javascript" data-trim>
 (function () {
@@ -459,7 +459,7 @@ question.editionView()
 <!-- ####################################################################  -->
         <section>
             <h6>Supported multi-model relationships</h6>
-            Relationhsip defined byt special refernece field type:
+            Relationship defined by special reference field type:
             <ul>
                 <li><code>reference</code> - for one to one relationships</li>
                 <li><code>referenced_list</code> - for many to one relationships</li>
@@ -520,7 +520,7 @@ GET /comments/124
 
 <!-- ####################################################################  -->
         <section>
-            <h6>reference_many filed type</h6>
+            <h6>reference_many field type</h6>
             <pre><code class="hljs javascript" data-trim>
 GET /posts/456
 {
@@ -569,8 +569,8 @@ GET /comments/124
                             for initial code generation</li>
                         <li>Add <code>js</code> logic to generate admin configuration based on
                                 exposed metadata using REST API </li>
-                        <li>Add <code>python</code> logic to generate admin configuraion on the fly, using
-                            familiar django syntax</li>
+                        <li>Add <code>python</code> logic to generate admin configuration on the fly, using
+                            familiar <code>django</code> syntax</li>
                         <p></p>
                         <hr>
                         But you know what? It is possible to have all options
